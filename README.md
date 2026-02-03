@@ -40,7 +40,7 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/junyilu/stealth-reader.git
+git clone https://github.com/hzlujunyi/stealth-reader.git
 cd stealth-reader
 
 # 安装依赖
