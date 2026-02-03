@@ -2,7 +2,7 @@
   "name": "stealth-reader",
   "version": "1.0.0",
   "description": "A stealthy TXT reader with auto-hide and reading statistics",
-  "author": "Your Name",
+  "author": "hzlujunyi",
   "license": "MIT",
   "main": "out/main/index.js",
   "scripts": {
