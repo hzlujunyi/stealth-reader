@@ -2,7 +2,7 @@
 
 一款极简的 TXT 电子书阅读器，专为需要低调阅读场景设计。
 
-![preview](https://img.shields.io/badge/platform-Windows-blue) ![license](https://img.shields.io/badge/license-MIT-green)
+![preview](https://img.shields.io/badge/platform-Windows-blue) ![license](https://img.shields.io/badge/license-MIT-green) [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/junyi) [![Ko-fi](https://img.shields.io/badge/Ko--fi-ff5e5b?logo=ko-fi&logoColor=white)](https://ko-fi.com/junyilu)
 
 ## 特性
 
@@ -40,7 +40,7 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/your-username/stealth-reader.git
+git clone https://github.com/junyilu/stealth-reader.git
 cd stealth-reader
 
 # 安装依赖
@@ -158,6 +158,13 @@ npm run typecheck
 # 打包
 npm run build
 ```
+
+## 支持项目
+
+如果这个项目对你有帮助，欢迎请作者喝杯咖啡：
+
+<a href="https://buymeacoffee.com/junyi" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="50" ></a>
+<a href="https://ko-fi.com/junyilu" target="_blank"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Ko-fi" height="50" ></a>
 
 ## 许可证
 
