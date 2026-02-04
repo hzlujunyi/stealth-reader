@@ -1,14 +1,16 @@
-const { app, BrowserWindow, ipcMain, dialog, Menu, screen, desktopCapturer } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog, Menu, screen, desktopCapturer, Tray, nativeImage } = require('electron')
 const { join } = require('path')
 const fs = require('fs')
 
 let Store
 let store
 let mainWindow = null
+let tray = null
 let isMouseInWindow = false
 let mouseCheckInterval = null
 let isMenuOpen = false  // 菜单打开时暂停自动隐藏
 let isAutoHidePaused = true  // 暂停自动隐藏（默认暂停，等渲染进程通知）
+let isAutoHideEnabled = true  // 本地追踪自动隐藏状态（避免每次从store读取）
 
 function getStore() {
   if (!store) {
@@ -16,6 +18,44 @@ function getStore() {
     store = new Store()
   }
   return store
+}
+
+function createTray() {
+  // 创建托盘图标
+  const iconPath = join(__dirname, '../public/icon.ico')
+  let trayIcon
+  try {
+    trayIcon = nativeImage.createFromPath(iconPath)
+    if (trayIcon.isEmpty()) {
+      // 如果图标加载失败，创建一个简单的灰色图标
+      trayIcon = nativeImage.createEmpty()
+    }
+  } catch (e) {
+    trayIcon = nativeImage.createEmpty()
+  }
+
+  tray = new Tray(trayIcon)
+  tray.setToolTip('StealthReader')
+
+  const contextMenu = Menu.buildFromTemplate([
+    { label: '显示窗口', click: () => mainWindow && mainWindow.show() },
+    { label: '隐藏窗口', click: () => mainWindow && mainWindow.hide() },
+    { type: 'separator' },
+    { label: '退出', click: () => app.quit() }
+  ])
+
+  tray.setContextMenu(contextMenu)
+
+  // 点击托盘图标切换窗口显示/隐藏
+  tray.on('click', () => {
+    if (mainWindow) {
+      if (mainWindow.isVisible()) {
+        mainWindow.hide()
+      } else {
+        mainWindow.show()
+      }
+    }
+  })
 }
 
 function createWindow() {
@@ -36,7 +76,7 @@ function createWindow() {
     transparent: true,
     alwaysOnTop: settings.alwaysOnTop,
     resizable: true,
-    skipTaskbar: false,
+    skipTaskbar: true,  // 不在任务栏显示
     webPreferences: {
       preload: join(__dirname, '../preload/preload.js'),
       contextIsolation: true,
@@ -52,7 +92,10 @@ function createWindow() {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 
-  if (settings.autoHideOnMouseLeave) {
+  // 初始化自动隐藏状态（从设置读取，默认true）
+  isAutoHideEnabled = settings.autoHideOnMouseLeave !== false
+
+  if (isAutoHideEnabled) {
     startMouseTracking()
   }
 
@@ -65,12 +108,23 @@ function createWindow() {
 }
 
 function startMouseTracking() {
+  // 如果自动隐藏被禁用，不启动追踪
+  if (!isAutoHideEnabled) {
+    return
+  }
+
   if (mouseCheckInterval) {
     clearInterval(mouseCheckInterval)
   }
 
   mouseCheckInterval = setInterval(() => {
     if (!mainWindow) return
+
+    // 双重检查：如果自动隐藏被禁用，停止追踪
+    if (!isAutoHideEnabled) {
+      stopMouseTracking()
+      return
+    }
 
     const point = screen.getCursorScreenPoint()
     const bounds = mainWindow.getBounds()
@@ -80,18 +134,13 @@ function startMouseTracking() {
                      point.y >= bounds.y &&
                      point.y <= bounds.y + bounds.height
 
-    const storeInstance = getStore()
-    const settings = storeInstance.get('settings', { autoHideOnMouseLeave: true })
-    // autoHideOnMouseLeave 默认为 true
-    const autoHide = settings.autoHideOnMouseLeave !== false
-
     if (isInside) {
       // 鼠标在窗口内，显示窗口
       if (!mainWindow.isVisible()) {
         mainWindow.show()
       }
-    } else if (autoHide && mainWindow.isVisible() && !isMenuOpen && !isAutoHidePaused) {
-      // 鼠标在窗口外且设置了自动隐藏且菜单未打开且未暂停，隐藏窗口
+    } else if (mainWindow.isVisible() && !isMenuOpen && !isAutoHidePaused) {
+      // 鼠标在窗口外且菜单未打开且未暂停，隐藏窗口
       mainWindow.hide()
     }
   }, 100)
@@ -163,12 +212,14 @@ function setupIPC() {
   })
 
   ipcMain.handle('set-auto-hide', (_, value) => {
+    isAutoHideEnabled = value
     getStore().set('settings.autoHideOnMouseLeave', value)
+
     if (value) {
       startMouseTracking()
     } else {
       stopMouseTracking()
-      if (mainWindow && !mainWindow.isVisible()) {
+      if (mainWindow) {
         mainWindow.show()
       }
     }
@@ -226,6 +277,21 @@ function setupIPC() {
     isAutoHidePaused = paused
   })
 
+  // 切换自动隐藏功能
+  ipcMain.handle('toggle-auto-hide', (_, enabled) => {
+    isAutoHideEnabled = enabled
+    getStore().set('settings.autoHideOnMouseLeave', enabled)
+
+    if (enabled) {
+      startMouseTracking()
+    } else {
+      stopMouseTracking()
+      if (mainWindow) {
+        mainWindow.show()
+      }
+    }
+  })
+
   // 截取全屏用于取色
   ipcMain.handle('capture-screen', async () => {
     try {
@@ -276,10 +342,15 @@ app.commandLine.appendSwitch('disable-gpu-shader-disk-cache')
 app.whenReady().then(() => {
   setupIPC()
   createWindow()
+  createTray()
 })
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    if (tray) {
+      tray.destroy()
+      tray = null
+    }
     app.quit()
   }
 })

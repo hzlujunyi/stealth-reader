@@ -8,6 +8,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   setAlwaysOnTop: (value) => ipcRenderer.invoke('set-always-on-top', value),
   setFrameless: (value) => ipcRenderer.invoke('set-frameless', value),
   setAutoHide: (value) => ipcRenderer.invoke('set-auto-hide', value),
+  toggleAutoHide: (enabled) => ipcRenderer.invoke('toggle-auto-hide', enabled),
   showWindow: () => ipcRenderer.invoke('show-window'),
   hideWindow: () => ipcRenderer.invoke('hide-window'),
   minimizeWindow: () => ipcRenderer.invoke('minimize-window'),

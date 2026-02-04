@@ -17,6 +17,21 @@ const containerWidth = ref(300)
 // 当前行内的字符偏移（用于长行的部分显示）
 const charOffset = ref(0)
 
+// 进度条显示状态（按P键切换）
+const showProgressBar = ref(false)
+let progressBarTimer: ReturnType<typeof setTimeout> | null = null
+
+function toggleProgressBar() {
+  showProgressBar.value = !showProgressBar.value
+  // 显示后3秒自动隐藏
+  if (showProgressBar.value) {
+    if (progressBarTimer) clearTimeout(progressBarTimer)
+    progressBarTimer = setTimeout(() => {
+      showProgressBar.value = false
+    }, 3000)
+  }
+}
+
 // 当书籍或行变化时重置字符偏移
 watch(() => bookStore.currentBook?.currentLine, () => {
   charOffset.value = 0
@@ -188,6 +203,10 @@ function handleKeydown(e: KeyboardEvent) {
       charOffset.value = 0
       bookStore.goToLine(bookStore.currentBook?.totalLines || 0)
       break
+    case 'p':
+    case 'P':
+      toggleProgressBar()
+      break
   }
 }
 
@@ -264,8 +283,8 @@ document.addEventListener('visibilitychange', () => {
       </div>
     </div>
 
-    <!-- 进度条 (悬浮显示) -->
-    <div class="progress-bar-container" v-if="bookStore.currentBook">
+    <!-- 进度条 (按P键显示) -->
+    <div class="progress-bar-container" :class="{ visible: showProgressBar }" v-if="bookStore.currentBook">
       <input
         type="range"
         class="progress-bar"
@@ -307,7 +326,7 @@ document.addEventListener('visibilitychange', () => {
   text-overflow: ellipsis;
 }
 
-/* 进度条容器 - 默认隐藏，悬浮显示 */
+/* 进度条容器 - 默认隐藏，按P键显示 */
 .progress-bar-container {
   position: absolute;
   bottom: 6px;
@@ -317,14 +336,16 @@ document.addEventListener('visibilitychange', () => {
   align-items: center;
   gap: 8px;
   opacity: 0;
+  pointer-events: none;
   transition: opacity 0.2s ease;
   padding: 4px 8px;
   background: rgba(0, 0, 0, 0.03);
   border-radius: 4px;
 }
 
-.reader:hover .progress-bar-container {
+.progress-bar-container.visible {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .progress-bar {

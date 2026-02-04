@@ -13,6 +13,14 @@ function handleOverlayClick(e: MouseEvent) {
   }
 }
 
+// 专门处理自动隐藏开关（按钮切换）
+async function handleAutoHideClick() {
+  const newValue = !settingsStore.settings.autoHideOnMouseLeave
+  settingsStore.settings.autoHideOnMouseLeave = newValue
+  await (window.electronAPI as any).toggleAutoHide(newValue)
+  await window.electronAPI.setStore('settings', settingsStore.settings)
+}
+
 // 将颜色转换为十六进制格式供 color input 使用
 function colorToHex(color: string): string {
   // 如果已经是 hex 格式
@@ -348,14 +356,16 @@ function showColorPickerOverlay(imageDataUrl: string) {
             <label for="alwaysOnTop">窗口置顶</label>
           </div>
 
-          <div class="field checkbox">
-            <input
-              type="checkbox"
-              id="autoHide"
-              :checked="settingsStore.settings.autoHideOnMouseLeave"
-              @change="settingsStore.updateSetting('autoHideOnMouseLeave', ($event.target as HTMLInputElement).checked)"
-            />
-            <label for="autoHide">鼠标移开自动隐藏</label>
+          <div class="field">
+            <label>鼠标移开自动隐藏</label>
+            <button
+              type="button"
+              class="toggle-btn"
+              :class="{ active: settingsStore.settings.autoHideOnMouseLeave }"
+              @click="handleAutoHideClick"
+            >
+              {{ settingsStore.settings.autoHideOnMouseLeave ? '开启' : '关闭' }}
+            </button>
           </div>
         </div>
 
@@ -602,6 +612,27 @@ function showColorPickerOverlay(imageDataUrl: string) {
   height: 16px;
   accent-color: #666;
   cursor: pointer;
+}
+
+.toggle-btn {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f5f5f5;
+  cursor: pointer;
+  font-size: 12px;
+  color: #666;
+  min-width: 50px;
+}
+
+.toggle-btn:hover {
+  background: #eee;
+}
+
+.toggle-btn.active {
+  background: #4a9;
+  border-color: #4a9;
+  color: white;
 }
 
 .actions {
