@@ -2,7 +2,7 @@
 
 一款极简的 TXT 电子书阅读器，专为需要低调阅读场景设计。
 
-![preview](https://img.shields.io/badge/platform-Windows-blue) ![license](https://img.shields.io/badge/license-MIT-green) [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/junyi) [![Ko-fi](https://img.shields.io/badge/Ko--fi-ff5e5b?logo=ko-fi&logoColor=white)](https://ko-fi.com/junyilu)
+![preview](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-blue) ![license](https://img.shields.io/badge/license-MIT-green) [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/junyi) [![Ko-fi](https://img.shields.io/badge/Ko--fi-ff5e5b?logo=ko-fi&logoColor=white)](https://ko-fi.com/junyilu)
 
 ## 特性
 
@@ -34,8 +34,13 @@
 
 从 [Releases](../../releases) 页面下载：
 
+**Windows:**
 - **便携版** (`StealthReader x.x.x.exe`) - 无需安装，双击即可运行
 - **安装版** (`StealthReader Setup x.x.x.exe`) - 标准 Windows 安装程序
+
+**macOS:**
+- **DMG 安装包** (`StealthReader-x.x.x.dmg`) - 拖入 Applications 即可
+- **ZIP 压缩包** (`StealthReader-x.x.x-mac.zip`) - 解压后直接运行
 
 ### 从源码构建
 
@@ -50,8 +55,11 @@ npm install
 # 开发模式运行
 npm run dev
 
-# 打包
-npm run build
+# 打包 Windows
+npm run build:win
+
+# 打包 macOS (需在 macOS 上执行)
+npm run build:mac
 ```
 
 ## 使用方法

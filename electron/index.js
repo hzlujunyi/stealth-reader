@@ -21,14 +21,30 @@ function getStore() {
 }
 
 function createTray() {
-  // 创建托盘图标
-  const iconPath = join(__dirname, '../public/icon.ico')
+  // 创建托盘图标 - 根据平台选择不同格式
+  let iconPath
+  if (process.platform === 'darwin') {
+    // macOS 使用 PNG 模板图标（16x16 或 22x22）
+    iconPath = join(__dirname, '../public/iconTemplate.png')
+    // 如果没有模板图标，尝试使用普通 PNG
+    if (!fs.existsSync(iconPath)) {
+      iconPath = join(__dirname, '../public/icon.png')
+    }
+  } else {
+    // Windows 使用 ICO 图标
+    iconPath = join(__dirname, '../public/icon.ico')
+  }
+
   let trayIcon
   try {
     trayIcon = nativeImage.createFromPath(iconPath)
     if (trayIcon.isEmpty()) {
       // 如果图标加载失败，创建一个简单的灰色图标
       trayIcon = nativeImage.createEmpty()
+    }
+    // macOS 模板图标设置
+    if (process.platform === 'darwin') {
+      trayIcon.setTemplateImage(true)
     }
   } catch (e) {
     trayIcon = nativeImage.createEmpty()

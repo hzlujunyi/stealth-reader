@@ -26,3 +26,13 @@ npm-debug.log*
 
 # Electron builder cache
 .electron-builder-cache/
+
+# Claude
+.claude/
+
+# Test files
+test-*.js
+
+# Temp files
+dist-electron/
+*.txt
