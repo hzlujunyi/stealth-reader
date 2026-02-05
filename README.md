@@ -1,5 +1,9 @@
 # StealthReader
 
+<p align="center">
+  <img src="public/icon.png" alt="StealthReader" width="128" height="128">
+</p>
+
 一款极简的 TXT 电子书阅读器，专为需要低调阅读场景设计。
 
 ![preview](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-blue) ![license](https://img.shields.io/badge/license-MIT-green) [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/junyi) [![Ko-fi](https://img.shields.io/badge/Ko--fi-ff5e5b?logo=ko-fi&logoColor=white)](https://ko-fi.com/junyilu)

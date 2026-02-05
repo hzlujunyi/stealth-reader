@@ -1,6 +1,6 @@
 {
   "name": "stealth-reader",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A stealthy TXT reader with auto-hide and reading statistics",
   "author": "hzlujunyi",
   "license": "MIT",
