@@ -47,8 +47,6 @@ jobs:
             release/*.exe
             release/*.dmg
             release/*.zip
-            release/*.blockmap
-            release/latest*.yml
 
   release:
     needs: build
@@ -71,7 +69,10 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: release/*
+          files: |
+            release/*.exe
+            release/*.dmg
+            release/*.zip
           draft: false
           prerelease: false
         env:
